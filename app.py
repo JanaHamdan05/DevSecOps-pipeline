@@ -30,7 +30,18 @@ def get_user():
             return jsonify(user)
 
     return jsonify({"error": "User not found"}), 404
+    
+@app.route("/search")
+def search_user():
+    username = request.args.get("username")
 
+    query = "SELECT * FROM users WHERE name = '" + username + "'"
+
+    return jsonify({
+        "query": query,
+        "message": "Search executed"
+    })
+    
 
 if __name__ == "__main__":
     app.run(host="127.0.0.1", port=5000)
