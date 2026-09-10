@@ -2,6 +2,15 @@ from flask import Flask, request, jsonify
 
 app = Flask(__name__)
 
+@app.after_request
+def add_security_headers(response):
+    response.headers["X-Content-Type-Options"] = "nosniff"
+    response.headers["Content-Security-Policy"] = "default-src 'self'"
+    response.headers["Permissions-Policy"] = "geolocation=(), microphone=(), camera=()"
+    response.headers["Cross-Origin-Resource-Policy"] = "same-origin"
+
+    return response
+
 users = [
     {"id": 1, "name": "Jana", "role": "intern"},
     {"id": 2, "name": "Admin", "role": "admin"}
