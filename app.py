@@ -35,10 +35,8 @@ def get_user():
 def search_user():
     username = request.args.get("username")
 
-    query = "SELECT * FROM users WHERE name = '" + username + "'"
-
     return jsonify({
-        "query": query,
+        "username": username,
         "message": "Search executed"
     })
     
