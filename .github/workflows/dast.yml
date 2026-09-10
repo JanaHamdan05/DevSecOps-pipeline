@@ -6,6 +6,9 @@ on:
   pull_request:
     branches: [ "main" ]
 
+permissions:
+  contents: read
+
 jobs:
   dast:
     runs-on: ubuntu-latest
@@ -26,9 +29,27 @@ jobs:
             flask --app app.py run --host=0.0.0.0 --port=5000
 
       - name: Wait for application
-        run: sleep 5
+        run: |
+          for i in {1..30}; do
+            if curl -fs http://127.0.0.1:5000/; then
+              exit 0
+            fi
+            sleep 2
+          done
+          docker logs flask-app
+          exit 1
 
       - name: Run OWASP ZAP
         uses: zaproxy/action-baseline@v0.14.0
         with:
           target: "http://localhost:5000"
+          allow_issue_writing: false
+
+      - name: Upload ZAP report
+        uses: actions/upload-artifact@v4
+        with:
+          name: zap-report
+          path: |
+            report_html.html
+            report_json.json
+            report_md.md
